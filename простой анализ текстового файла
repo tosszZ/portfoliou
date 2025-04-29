@@ -27,3 +27,4 @@ def analyze_lyrics(file_path):
         print("Ошибка: неверная кодировка файла!")
     except Exception as e:
         print(f"Неизвестная ошибка: {e}")
+analyze_lyrics()
