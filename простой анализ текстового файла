@@ -1,7 +1,9 @@
 from collections import Counter
 import os
 
+file_path = input()
 def analyze_lyrics(file_path):
+    file_path = os.path.abspath(file_path)
     if not os.path.exists(file_path):
         print(f"Ошибка: файл {file_path} не найден!")
         return
@@ -27,4 +29,5 @@ def analyze_lyrics(file_path):
         print("Ошибка: неверная кодировка файла!")
     except Exception as e:
         print(f"Неизвестная ошибка: {e}")
-analyze_lyrics()
+analyze_lyrics(file_path)
+
