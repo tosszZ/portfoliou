@@ -1,13 +1,38 @@
 from collections import Counter
 import os
 
-file_path = input()
-def analyze_lyrics(file_path):
-    file_path = os.path.abspath(file_path)
-    if not os.path.exists(file_path):
-        print(f"Ошибка: файл {file_path} не найден!")
+def analyze_lyrics(filename):
+    # Получаем путь к директории скрипта
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Получаем путь к родительской директории
+    parent_dir = os.path.dirname(script_dir)
+    
+    # Ищем файл во всех поддиректориях
+    file_path = None
+    for root, _, files in os.walk(parent_dir):
+        if filename in files:
+            file_path = os.path.join(root, filename)
+            break
+    
+    if file_path is None:
+        print(f"\nОшибка: файл '{filename}' не найден в поддиректориях!")
+        print(f"Родительская директория для поиска: {parent_dir}")
+        print("\nРекомендации:")
+        print("1. Убедитесь, что файл находится в одной из подпапок родительской директории")
+        print("2. Проверьте правильность имени файла и расширение (.txt)")
+        print("3. Доступные поддиректории в родительской папке:")
+        
+        # Выводим список поддиректорий для помощи пользователю
+        for root, dirs, _ in os.walk(parent_dir):
+            if dirs:  # Если есть поддиректории
+                print(f"- {os.path.relpath(root, parent_dir)}/")
+                for d in dirs:
+                    print(f"  └─ {d}/")
         return
     
+    print(f"\nФайл найден по пути: {file_path}")
+
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             text = file.read().lower()
@@ -21,13 +46,19 @@ def analyze_lyrics(file_path):
 
         top_words = Counter(words).most_common(5)
 
+        print("\nРезультаты анализа:")
         print(f"Всего слов: {word_count}")
-        print(f"Уникальных слов:  {unique_words}")
+        print(f"Уникальных слов: {unique_words}")
         print(f"Топ-5 слов: {top_words}")
 
     except UnicodeDecodeError:
-        print("Ошибка: неверная кодировка файла!")
+        print("\nОшибка: неверная кодировка файла!")
+        print("Рекомендуется сохранить файл в UTF-8")
     except Exception as e:
-        print(f"Неизвестная ошибка: {e}")
-analyze_lyrics(file_path)
+        print(f"\nНеизвестная ошибка: {e}")
 
+# Ввод имени файла
+print("\nПрограмма анализа текстов песен")
+print("Файл должен находиться в одной из поддиректорий родительской папки")
+filename = input("Введите имя файла (например: 'песня.txt'): ").strip()
+analyze_lyrics(filename)
