@@ -35,7 +35,12 @@ def analyze_lyrics(filename):
 
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read().lower()
+            # Читаем все строки файла
+            lines = file.readlines()
+            line_count = len(lines)
+            
+            # Объединяем строки в один текст для дальнейшего анализа
+            text = ''.join(lines).lower()
 
         punct = r'''!()-[]{};:\'",<>./?@#$%^&*_~'''
         cleaned_text = ''.join(char for char in text if char not in punct)
@@ -47,6 +52,7 @@ def analyze_lyrics(filename):
         top_words = Counter(words).most_common(5)
 
         print("\nРезультаты анализа:")
+        print(f"Количество строк: {line_count}")
         print(f"Всего слов: {word_count}")
         print(f"Уникальных слов: {unique_words}")
         print(f"Топ-5 слов: {top_words}")
