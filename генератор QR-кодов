@@ -2,7 +2,7 @@ import qrcode
 import PIL  # Для работы с изображениями
 import os
 
-def generate_qr(data, filename=r"C:\Users\2024\Desktop\пайтон\QR-коды\qrcode.png", fill_color="black", back_color="white"):
+def generate_qr(data, filename="qrcode.png", fill_color="black", back_color="white"):
     """
     Генерирует QR-код и сохраняет его в файл
     :param data: Текст или URL для кодирования
@@ -23,18 +23,29 @@ def generate_qr(data, filename=r"C:\Users\2024\Desktop\пайтон\QR-коды\
         qr.add_data(data)# принимает любой текст/ссылку
         qr.make(fit=True)# автоматически подбирает минимальную версию QR-кода
         
-        # Создаем изображение
+        # Создаем изображение 
         img = qr.make_image(fill_color=fill_color, back_color=back_color)
+
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(script_dir)
+        target_dir = os.path.join(parent_dir, "QR-коды")# род. директория + целевая папка
+         
+        # Создаем папку, если её нет
+        os.makedirs(target_dir, exist_ok=True)
+        
+        # Формируем полный путь для сохранения
+        save_path = os.path.join(target_dir, filename)
         
         # Сохраняем
-        img.save(filename)
-        print(f"QR-код успешно сохранен как {filename}")
+        img.save(save_path)
+        print(f"\n QR-код успешно сохранен как: {os.path.relpath(save_path)}")
         
         # Показываем QR-код (если есть возможность)
         try:
             img.show()
+            print(f"Файл сохранен в: {os.path.abspath(save_path)}")
         except:
-            print(f"Файл сохранен в: {os.path.abspath(filename)}")
+            print(f"Файл сохранен в: {os.path.abspath(save_path)}")
             
     except Exception as e:
         print(f"Ошибка: {e}")
@@ -48,5 +59,6 @@ data = input("Введите текст или URL: ").strip()
 filename = input("Имя файла для сохранения (по умолчанию qrcode.png): ").strip() or "qrcode.png"
 fill = input("Цвет QR-кода (по умолчанию black): ").strip() or "black"
 bg = input("Цвет фона (по умолчанию white): ").strip() or "white"
-
+if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+    filename += '.png'  # Добавляем расширение по умолчанию
 generate_qr(data, filename, fill, bg)
