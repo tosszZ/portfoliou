@@ -2,7 +2,7 @@ import qrcode
 import PIL  # Для работы с изображениями
 import os
 
-def generate_qr(data, filename="qrcode.png", fill_color="black", back_color="white"):
+def generate_qr(data, version, filename="qrcode.png", fill_color="black", back_color="white"):
     """
     Генерирует QR-код и сохраняет его в файл
     :param data: Текст или URL для кодирования
@@ -13,7 +13,7 @@ def generate_qr(data, filename="qrcode.png", fill_color="black", back_color="whi
     try:
         # Создаем объект QRCode
         qr = qrcode.QRCode(
-            version=1,# Размер QR-кода (1-40)
+            version=version,# Размер QR-кода (1-40)
             error_correction=qrcode.constants.ERROR_CORRECT_H,# Уровень коррекции ошибок(L,M,Q,H)
             box_size=10,# Размер одного "кубика" QR-кода в пикселях
             border=4,# Толщина белой рамки вокруг кода
@@ -56,9 +56,10 @@ print("ГЕНЕРАТОР QR-КОДОВ".center(40))
 print("="*40)
 
 data = input("Введите текст или URL: ").strip()
+version = int(input("Введите размер от 1 до 40(по умолчанию 1): ")) or 1
 filename = input("Имя файла для сохранения (по умолчанию qrcode.png): ").strip() or "qrcode.png"
 fill = input("Цвет QR-кода (по умолчанию black): ").strip() or "black"
 bg = input("Цвет фона (по умолчанию white): ").strip() or "white"
 if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
     filename += '.png'  # Добавляем расширение по умолчанию
-generate_qr(data, filename, fill, bg)
+generate_qr(data, version, filename, fill, bg)
