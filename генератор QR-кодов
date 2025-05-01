@@ -1,0 +1,52 @@
+import qrcode
+import PIL  # Для работы с изображениями
+import os
+
+def generate_qr(data, filename=r"C:\Users\2024\Desktop\пайтон\QR-коды\qrcode.png", fill_color="black", back_color="white"):
+    """
+    Генерирует QR-код и сохраняет его в файл
+    :param data: Текст или URL для кодирования
+    :param filename: Имя файла для сохранения (.png или .jpg)
+    :param fill_color: Цвет QR-кода (можно использовать HEX #000000)
+    :param back_color: Цвет фона
+    """
+    try:
+        # Создаем объект QRCode
+        qr = qrcode.QRCode(
+            version=1,# Размер QR-кода (1-40)
+            error_correction=qrcode.constants.ERROR_CORRECT_H,# Уровень коррекции ошибок(L,M,Q,H)
+            box_size=10,# Размер одного "кубика" QR-кода в пикселях
+            border=4,# Толщина белой рамки вокруг кода
+        )
+        
+        # Добавляем данные
+        qr.add_data(data)# принимает любой текст/ссылку
+        qr.make(fit=True)# автоматически подбирает минимальную версию QR-кода
+        
+        # Создаем изображение
+        img = qr.make_image(fill_color=fill_color, back_color=back_color)
+        
+        # Сохраняем
+        img.save(filename)
+        print(f"QR-код успешно сохранен как {filename}")
+        
+        # Показываем QR-код (если есть возможность)
+        try:
+            img.show()
+        except:
+            print(f"Файл сохранен в: {os.path.abspath(filename)}")
+            
+    except Exception as e:
+        print(f"Ошибка: {e}")
+
+# Интерфейс
+print("\n" + "="*40)
+print("ГЕНЕРАТОР QR-КОДОВ".center(40))
+print("="*40)
+
+data = input("Введите текст или URL: ").strip()
+filename = input("Имя файла для сохранения (по умолчанию qrcode.png): ").strip() or "qrcode.png"
+fill = input("Цвет QR-кода (по умолчанию black): ").strip() or "black"
+bg = input("Цвет фона (по умолчанию white): ").strip() or "white"
+
+generate_qr(data, filename, fill, bg)
