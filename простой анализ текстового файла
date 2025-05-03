@@ -104,6 +104,7 @@ def analyze_lyrics(filename):
 print("\nПрограмма анализа текстов песен")
 print("Файл должен находиться в одной из поддиректорий родительской папки")
 filename = input("Введите имя файла (например: 'песня.txt' или 'песня'): ").strip()
-if not filename.endswith('.txt'):
-    filename += '.txt'
+base, ext = os.path.splitext(filename)
+if ext.lower() not in ['.txt', '.text']:
+    filename = base + '.txt'
 analyze_lyrics(filename)
