@@ -1,5 +1,6 @@
 from collections import Counter
 import os
+from datetime import datetime
 
 def analyze_lyrics(filename):
     # Получаем путь к директории скрипта
@@ -7,6 +8,10 @@ def analyze_lyrics(filename):
     
     # Получаем путь к родительской директории
     parent_dir = os.path.dirname(script_dir)
+    
+    # Создаем папку для результатов анализа, если ее нет
+    results_dir = os.path.join(parent_dir, "результаты анализа")
+    os.makedirs(results_dir, exist_ok=True)
     
     # Ищем файл во всех поддиректориях
     file_path = None
@@ -23,23 +28,17 @@ def analyze_lyrics(filename):
         print("2. Проверьте правильность имени файла и расширение (.txt)")
         print("3. Доступные поддиректории в родительской папке:")
         
-        # Выводим список поддиректорий для помощи пользователю
         for root, dirs, _ in os.walk(parent_dir):
-            if dirs:  # Если есть поддиректории
+            if dirs:
                 print(f"- {os.path.relpath(root, parent_dir)}/")
                 for d in dirs:
                     print(f"  └─ {d}/")
         return
-    
-    print(f"\nФайл найден по пути: {file_path}")
 
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
-            # Читаем все строки файла
             lines = file.readlines()
             line_count = len(lines)
-            
-            # Объединяем строки в один текст для дальнейшего анализа
             text = ''.join(lines).lower()
 
         punct = r'''!()-[]{};:\'",<>./?@#$%^&*_~'''
@@ -51,11 +50,40 @@ def analyze_lyrics(filename):
 
         top_words = Counter(words).most_common(5)
 
-        print("\nРезультаты анализа:")
-        print(f"Количество строк: {line_count}")
-        print(f"Всего слов: {word_count}")
-        print(f"Уникальных слов: {unique_words}")
-        print(f"Топ-5 слов: {top_words}")
+        # Формируем отчет
+        report = f"""Результаты анализа файла: {filename}
+Дата анализа: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Путь к файлу: {file_path}
+
+Количество строк: {line_count}
+Всего слов: {word_count}
+Уникальных слов: {unique_words}
+Топ-5 слов: {top_words}
+"""
+
+        # Формируем имя файла для результата (без даты, чтобы можно было проверять существование)
+        result_filename = f"анализ_{os.path.splitext(filename)[0]}.txt"
+        result_path = os.path.join(results_dir, result_filename)
+        
+        # Проверяем существование файла
+        if os.path.exists(result_path):
+            print(f"\nФайл анализа '{result_filename}' уже существует!")
+            while True:
+                choice = input("Перезаписать файл? (да/нет): ").strip().lower()
+                if choice in ['да', 'д', 'yes', 'y']:
+                    break
+                elif choice in ['нет', 'н', 'no', 'n']:
+                    print("\nАнализ отменен. Файл не был перезаписан.")
+                    return
+                else:
+                    print("Пожалуйста, введите 'да' или 'нет'")
+        
+        # Сохраняем отчет в файл
+        with open(result_path, 'w', encoding='utf-8') as result_file:
+            result_file.write(report)
+        
+        print(f"\nРезультаты сохранены в файл: {result_path}")
+        print (report)
 
     except UnicodeDecodeError:
         print("\nОшибка: неверная кодировка файла!")
