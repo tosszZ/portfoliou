@@ -28,17 +28,21 @@ def analyze_lyrics(filename):
         print("2. Проверьте правильность имени файла и расширение (.txt)")
         print("3. Доступные поддиректории в родительской папке:")
         
+        # Выводим список поддиректорий для помощи пользователю
         for root, dirs, _ in os.walk(parent_dir):
-            if dirs:
+            if dirs:  # Если есть поддиректории
                 print(f"- {os.path.relpath(root, parent_dir)}/")
                 for d in dirs:
                     print(f"  └─ {d}/")
         return
-
+    
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
+            # Читаем все строки файла
             lines = file.readlines()
             line_count = len(lines)
+            
+            # Объединяем строки в один текст для дальнейшего анализа
             text = ''.join(lines).lower()
 
         punct = r'''!()-[]{};:\'",<>./?@#$%^&*_~'''
@@ -50,18 +54,25 @@ def analyze_lyrics(filename):
 
         top_words = Counter(words).most_common(5)
 
-        # Формируем отчет
-        report = f"""Результаты анализа файла: {filename}
+        # Формируем отчет с красивым выводом
+        report = f"""\nРезультаты анализа файла: {filename}
 Дата анализа: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 Путь к файлу: {file_path}
 
-Количество строк: {line_count}
-Всего слов: {word_count}
-Уникальных слов: {unique_words}
-Топ-5 слов: {top_words}
-"""
+Общая статистика:
+├─ Количество строк: {line_count}
+├─ Всего слов: {word_count}
+└─ Уникальных слов: {unique_words}
 
-        # Формируем имя файла для результата (без даты, чтобы можно было проверять существование)
+Топ-5 самых частых слов:"""
+
+        # Добавляем слова в отчет с красивой нумерацией
+        for i, (word, count) in enumerate(top_words, 1):
+            report += f"\n{i}. {word.capitalize():<15} — {count} раз(а)"
+
+        print(report)
+
+        # Сохраняем отчет в файл
         result_filename = f"анализ_{os.path.splitext(filename)[0]}.txt"
         result_path = os.path.join(results_dir, result_filename)
         
@@ -73,17 +84,15 @@ def analyze_lyrics(filename):
                 if choice in ['да', 'д', 'yes', 'y']:
                     break
                 elif choice in ['нет', 'н', 'no', 'n']:
-                    print("\nАнализ отменен. Файл не был перезаписан.")
+                    print("Анализ отменен. Файл не был перезаписан.")
                     return
                 else:
                     print("Пожалуйста, введите 'да' или 'нет'")
         
-        # Сохраняем отчет в файл
         with open(result_path, 'w', encoding='utf-8') as result_file:
             result_file.write(report)
         
         print(f"\nРезультаты сохранены в файл: {result_path}")
-        print (report)
 
     except UnicodeDecodeError:
         print("\nОшибка: неверная кодировка файла!")
@@ -95,6 +104,6 @@ def analyze_lyrics(filename):
 print("\nПрограмма анализа текстов песен")
 print("Файл должен находиться в одной из поддиректорий родительской папки")
 filename = input("Введите имя файла (например: 'песня.txt' или 'песня'): ").strip()
-if not '.txt' in filename:
+if not filename.endswith('.txt'):
     filename += '.txt'
 analyze_lyrics(filename)
